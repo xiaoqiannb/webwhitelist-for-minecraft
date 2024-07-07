@@ -1,0 +1,4 @@
+name: whitelist
+version: '${version}'
+main: com.xiaoqiannb.whitelist
+api-version: '1.21'
