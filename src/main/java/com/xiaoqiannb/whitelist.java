@@ -88,16 +88,16 @@ public class whitelist extends JavaPlugin {
                 }
                 if (playerName != null && !playerName.isEmpty() && userCaptcha != null && userCaptcha.equals(captcha)) {
                     plugin.addToWhitelist(playerName);
-                    String response = "白名单申请成功!";
+                    String response = "success!";
                     exchange.sendResponseHeaders(200, response.length());
                     exchange.getResponseBody().write(response.getBytes());
                 } else {
-                    String response = "验证码存在问题";
+                    String response = "error Captcha";
                     exchange.sendResponseHeaders(400, response.length());
                     exchange.getResponseBody().write(response.getBytes());
                 }
             } else {
-                String response = "请求方法错误，这是一个技术性报错，请联系技术人员";
+                String response = "Technical errors";
                 exchange.sendResponseHeaders(405, response.length());
                 exchange.getResponseBody().write(response.getBytes());
             }
