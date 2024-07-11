@@ -1,18 +1,16 @@
 package com.xiaoqiannb;
 
-
-
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.command.ConsoleCommandSender;
+import org.bukkit.scheduler.BukkitRunnable;
+import com.sun.net.httpserver.HttpServer;
+import com.sun.net.httpserver.HttpHandler;
+import com.sun.net.httpserver.HttpExchange;
+
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.text.SimpleDateFormat;
 import java.util.Date;
-import com.sun.net.httpserver.HttpServer;
-import com.sun.net.httpserver.HttpHandler;
-import com.sun.net.httpserver.HttpExchange;
-import org.bukkit.scheduler.BukkitRunnable;
 
 public class whitelist extends JavaPlugin {
     private HttpServer server;
@@ -31,7 +29,7 @@ public class whitelist extends JavaPlugin {
 
     private void startWebServer() {
         try {
-            server = HttpServer.create(new InetSocketAddress(8080), 0);
+            server = HttpServer.create(new InetSocketAddress(12138), 0);
             server.createContext("/apply", new ApplicationHandler(this));
             server.setExecutor(null); // creates a default executor
             server.start();
@@ -54,20 +52,19 @@ public class whitelist extends JavaPlugin {
             }
         }.runTask(this);
     }
+
     static class ApplicationHandler implements HttpHandler {
         private final whitelist plugin;
-        private final String captcha;
 
         public ApplicationHandler(whitelist plugin) {
             this.plugin = plugin;
-            this.captcha = generateCaptcha();
         }
 
         private String generateCaptcha() {
-            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMddHH");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("ddHH");
             String dateString = dateFormat.format(new Date());
-            int captchaValue = Integer.parseInt(dateString) ;
-            //此处仅为提取日期例如2024010101（2024年1月1日1点）作为验证码，请自行设计算法
+            int captchaValue = Integer.parseInt(dateString);
+            captchaValue = (captchaValue + 412) * 12;
             return String.valueOf(captchaValue);
         }
 
@@ -86,18 +83,19 @@ public class whitelist extends JavaPlugin {
                         userCaptcha = keyValue[1];
                     }
                 }
+                String captcha = generateCaptcha(); // 每次请求时重新生成验证码
                 if (playerName != null && !playerName.isEmpty() && userCaptcha != null && userCaptcha.equals(captcha)) {
                     plugin.addToWhitelist(playerName);
-                    String response = "success!";
+                    String response = "success";
                     exchange.sendResponseHeaders(200, response.length());
                     exchange.getResponseBody().write(response.getBytes());
                 } else {
-                    String response = "error Captcha";
+                    String response = "error key";
                     exchange.sendResponseHeaders(400, response.length());
                     exchange.getResponseBody().write(response.getBytes());
                 }
             } else {
-                String response = "Technical errors";
+                String response = "error";
                 exchange.sendResponseHeaders(405, response.length());
                 exchange.getResponseBody().write(response.getBytes());
             }
@@ -105,3 +103,4 @@ public class whitelist extends JavaPlugin {
         }
     }
 }
+
