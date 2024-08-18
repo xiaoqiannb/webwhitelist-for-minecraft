@@ -64,7 +64,7 @@ public class whitelist extends JavaPlugin {
             SimpleDateFormat dateFormat = new SimpleDateFormat("ddHH");
             String dateString = dateFormat.format(new Date());
             int captchaValue = Integer.parseInt(dateString);
-            captchaValue = (captchaValue + 412) * 12;
+            captchaValue = captchaValue * 12;//验证码算法设置
             return String.valueOf(captchaValue);
         }
 
